@@ -1,4 +1,4 @@
-from utils import get_size, is_subscribed, is_req_subscribed, group_setting_buttons, get_poster, get_posterx, temp, get_settings, save_group_settings, get_cap, imdb, is_check_admin, extract_request_content, log_error, clean_filename, generate_season_variations, clean_search_text
+from utils import get_size, group_setting_buttons, get_poster, get_posterx, temp, get_settings, save_group_settings, get_cap, imdb, is_check_admin, extract_request_content, log_error, clean_filename, generate_season_variations, clean_search_text
 import tracemalloc
 from fuzzywuzzy import process
 from dreamxbotz.util.file_properties import get_name, get_hash
@@ -12,7 +12,6 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQ
 from info import *
 from Script import script
 from pyrogram.errors.exceptions.bad_request_400 import MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty
-from database.refer import referdb
 from database.users_chats_db import db
 import asyncio
 import re
@@ -20,13 +19,13 @@ import math
 import random
 import pytz
 from datetime import datetime, timedelta
+
 lock = asyncio.Lock()
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
 tracemalloc.start()
-
 
 TIMEZONE = "Asia/Kolkata"
 BUTTON = {}
@@ -36,7 +35,6 @@ BUTTONS0 = {}
 BUTTONS1 = {}
 BUTTONS2 = {}
 SPELL_CHECK = {}
-
 
 @Client.on_message(filters.group & filters.text & filters.incoming)
 async def give_filter(client, message):
@@ -67,12 +65,11 @@ async def give_filter(client, message):
             f"ʏᴏᴜʀ ʀᴇǫᴜᴇꜱᴛ ɪꜱ ᴀʟʀᴇᴀᴅʏ ᴀᴠᴀɪʟᴀʙʟᴇ ✅\n\n"
             f"📂 ꜰɪʟᴇꜱ ꜰᴏᴜɴᴅ : {str(total_results)}\n"
             f"🔍 ꜱᴇᴀʀᴄʜ :</b> <code>{search}</code>\n\n"
-            f"<b>‼️ ᴛʜɪs ɪs ᴀ <u>sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ</u> sᴏ ᴛʜᴀᴛ ʏᴏᴜ ᴄᴀɴ'ᴛ ɢᴇᴛ ғɪʟᴇs ғʀᴏᴍ ʜᴇʀᴇ...\n\n"
+            f"<b>‼️ ᴛʜɪꜱ ɪꜱ ᴀ <u>sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ</u> sᴏ ᴛʜᴀᴛ ʏᴏᴜ ᴄᴀɴ'ᴛ ɢᴇᴛ ғɪʟᴇs ғʀᴏᴍ ʜᴇʀᴇ...\n\n"
             f"📝 ꜱᴇᴀʀᴄʜ ʜᴇʀᴇ : 👇</b>",
             reply_markup=InlineKeyboardMarkup(
                 [[InlineKeyboardButton("🔍 ᴊᴏɪɴ ᴀɴᴅ ꜱᴇᴀʀᴄʜ ʜᴇʀᴇ 🔎", url=GRP_LNK)]])
         )
-
 
 @Client.on_message(filters.private & filters.text & filters.incoming & ~filters.regex(r"^/"))
 async def pm_text(bot, message):
@@ -103,41 +100,15 @@ async def pm_text(bot, message):
                     "</blockquote></b>"
                 ), reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("📝 ʀᴇǫᴜᴇsᴛ ʜᴇʀᴇ ", url=GRP_LNK)]]))
             await bot.send_message(chat_id=LOG_CHANNEL,
-                                   text=(
-                                       f"<b>#𝐏𝐌_𝐌𝐒𝐆\n\n"
-                                       f"👤 Nᴀᴍᴇ : {user}\n"
-                                       f"🆔 ID : {user_id}\n"
-                                       f"💬 Mᴇssᴀɢᴇ : {content}</b>"
-                                   )
-                                   )
+                                 text=(
+                                     f"<b>#𝐏𝐌_𝐌𝐒𝐆\n\n"
+                                     f"👤 Nᴀᴍᴇ : {user}\n"
+                                     f"🆔 ID : {user_id}\n"
+                                     f"💬 Mᴇssᴀɢᴇ : {content}</b>"
+                                 )
+                                 )
     except Exception:
         pass
-
-
-@Client.on_callback_query(filters.regex(r"^reffff"))
-async def refercall(bot, query):
-    btn = [[
-        InlineKeyboardButton(
-            'invite link', url=f'https://telegram.me/share/url?url=https://t.me/{bot.me.username}?start=reff_{query.from_user.id}&text=Hello%21%20Experience%20a%20bot%20that%20offers%20a%20vast%20library%20of%20unlimited%20movies%20and%20series.%20%F0%9F%98%83'),
-        InlineKeyboardButton(
-            f'⏳ {referdb.get_refer_points(query.from_user.id)}', callback_data='ref_point'),
-        InlineKeyboardButton('Back', callback_data='premium_info')
-    ]]
-    reply_markup = InlineKeyboardMarkup(btn)
-    try:
-        await bot.edit_message_media(
-            query.message.chat.id,
-            query.message.id,
-            InputMediaPhoto("https://graph.org/file/1a2e64aee3d4d10edd930.jpg")
-        )
-    except Exception as e:    
-        pass
-    await query.message.edit_text(
-        text=f'Hay Your refer link:\n\nhttps://t.me/{bot.me.username}?start=reff_{query.from_user.id}\n\nShare this link with your friends, Each time they join,  you will get 10 refferal points and after 100 points you will get 1 month premium subscription.',
-        reply_markup=reply_markup,
-        parse_mode=enums.ParseMode.HTML
-    )
-    await query.answer()
 
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
@@ -188,10 +159,7 @@ async def next_page(bot, query):
         btn.insert(0,
                    [
                        InlineKeyboardButton(
-                           "ʀᴇᴍᴏᴠᴇ ᴀᴅs", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                       InlineKeyboardButton(
                            "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
-
                    ]
                    )
 
@@ -208,8 +176,6 @@ async def next_page(bot, query):
                    ]
                    )
         btn.insert(0, [
-            InlineKeyboardButton(
-                "ʀᴇᴍᴏᴠᴇ ᴀᴅs", url=f"https://t.me/{temp.U_NAME}?start=premium"),
             InlineKeyboardButton("Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
         ])
     if ULTRA_FAST_MODE:
@@ -337,17 +303,12 @@ async def next_page(bot, query):
             logger.exception("Failed to send result: %s", e)
         except MessageNotModified:
             pass
-        # try:
-        #     await query.message.edit_text(text=cap, reply_markup=InlineKeyboardMarkup(btn), disable_web_page_preview=True, parse_mode=enums.ParseMode.HTML)
-        # except MessageNotModified:
-        #     pass
     else:
         try:
             await query.edit_message_reply_markup(reply_markup=InlineKeyboardMarkup(btn))
         except MessageNotModified:
             pass
     await query.answer()
-
 
 @Client.on_callback_query(filters.regex(r"^spol"))
 async def advantage_spoll_choker(bot, query):
@@ -415,7 +376,6 @@ async def qualities_cb_handler(client: Client, query: CallbackQuery):
 
     await query.edit_message_reply_markup(InlineKeyboardMarkup(btn))
 
-
 @Client.on_callback_query(filters.regex(r"^fq#"))
 async def filter_qualities_cb_handler(client: Client, query: CallbackQuery):
     _, qual, key = query.data.split("#")
@@ -465,8 +425,6 @@ async def filter_qualities_cb_handler(client: Client, query: CallbackQuery):
         btn.insert(0,
                    [
                        InlineKeyboardButton(
-                           "ʀᴇᴍᴏᴠᴇ ᴀᴅs", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                       InlineKeyboardButton(
                            "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
                    ])
     else:
@@ -484,10 +442,7 @@ async def filter_qualities_cb_handler(client: Client, query: CallbackQuery):
         btn.insert(0,
                    [
                        InlineKeyboardButton(
-                           "ʀᴇᴍᴏᴠᴇ ᴀᴅs", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                       InlineKeyboardButton(
                            "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
-
                    ])
     if offset != "":
         try:
@@ -536,8 +491,6 @@ async def filter_qualities_cb_handler(client: Client, query: CallbackQuery):
     await query.answer()
 
 # languages
-
-
 @Client.on_callback_query(filters.regex(r"^languages#"))
 async def languages_cb_handler(client: Client, query: CallbackQuery):
     try:
@@ -570,10 +523,9 @@ async def languages_cb_handler(client: Client, query: CallbackQuery):
     btn.insert(0, [InlineKeyboardButton(
         text="⇊ ꜱᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ ⇊", callback_data="ident")])
     btn.append([InlineKeyboardButton(text="↭ ʙᴀᴄᴋ ᴛᴏ ꜰɪʟᴇs ↭",
-               callback_data=f"fl#homepage#{key}")])
+                                      callback_data=f"fl#homepage#{key}")])
 
     await query.edit_message_reply_markup(InlineKeyboardMarkup(btn))
-
 
 @Client.on_callback_query(filters.regex(r"^fl#"))
 async def filter_languages_cb_handler(client: Client, query: CallbackQuery):
@@ -624,8 +576,6 @@ async def filter_languages_cb_handler(client: Client, query: CallbackQuery):
         btn.insert(0,
                    [
                        InlineKeyboardButton(
-                           "ʀᴇᴍᴏᴠᴇ ᴀᴅs", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                       InlineKeyboardButton(
                            "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
                    ]
                    )
@@ -642,8 +592,6 @@ async def filter_languages_cb_handler(client: Client, query: CallbackQuery):
                    ])
         btn.insert(0,
                    [
-                       InlineKeyboardButton(
-                           "ʀᴇᴍᴏᴠᴇ ᴀᴅs", url=f"https://t.me/{temp.U_NAME}?start=premium"),
                        InlineKeyboardButton(
                            "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
                    ])
@@ -690,13 +638,12 @@ async def filter_languages_cb_handler(client: Client, query: CallbackQuery):
             pass
     await query.answer()
 
-
 @Client.on_callback_query(filters.regex(r"^seasons#"))
 async def seasons_cb_handler(client: Client, query: CallbackQuery):
     try:
         if int(query.from_user.id) not in [query.message.reply_to_message.from_user.id, 0]:
             return await query.answer(
-                f"⚠️ ʜᴇʟʟᴏ {query.from_user.first_name},\nᴛʜɪꜱ ɪꜱ ɴᴏᴛ ʏᴏᴜʀ ᴍᴏᴠɪᴇ ʀᴇǫᴜᴇꜱᴛ,\nʀᴇǫᴜᴇꜱᴛ ʏᴏᴜʀ'ꜱ…",
+                f"⚠️ ʜᴇʟʟᴏ {query.from_user.first_name},\nᴛʜɪꜱ ɪꜱ ɴᴏᴛ ʏᴏᴜʀ ᴍᴏᴠɪᴇ ʀᴇǫᴜᴇꜱᴛ,\nʀᴇǫᴜᴇꜱᴛ ʏᴏᴜʀ'ꜱ…",
                 show_alert=True,
             )
     except Exception:
@@ -716,13 +663,12 @@ async def seasons_cb_handler(client: Client, query: CallbackQuery):
 
     btn.insert(
         0,
-        [InlineKeyboardButton("⇊ ꜱᴇʟᴇᴄᴛ ꜱᴇᴀꜱᴏɴ ⇊", callback_data="ident")],
+        [InlineKeyboardButton("⇊ ꜱᴇʟᴇᴄᴛ ꜱᴇᴀꜱᴏɴ ⇊", callback_data="ident")],
     )
     btn.append([InlineKeyboardButton(text="↭ ʙᴀᴄᴋ ᴛᴏ ꜰɪʟᴇs ​↭",
-               callback_data=f"next_{req}_{key}_{offset}")])
+                                      callback_data=f"next_{req}_{key}_{offset}")])
     await query.edit_message_reply_markup(InlineKeyboardMarkup(btn))
     await query.answer()
-
 
 @Client.on_callback_query(filters.regex(r"^fs#"))
 async def filter_seasons_cb_handler(client: Client, query: CallbackQuery):
@@ -778,8 +724,6 @@ async def filter_seasons_cb_handler(client: Client, query: CallbackQuery):
     btn.insert(
         0,
         [
-            InlineKeyboardButton(
-                "ʀᴇᴍᴏᴠᴇ ᴀᴅs", url=f"https://t.me/{temp.U_NAME}?start=premium"),
             InlineKeyboardButton("Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}"),
         ],
     )
@@ -832,7 +776,6 @@ async def filter_seasons_cb_handler(client: Client, query: CallbackQuery):
         except MessageNotModified:
             pass
     await query.answer()
-
 
 @Client.on_callback_query()
 async def cb_handler(client: Client, query: CallbackQuery):
@@ -921,11 +864,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
             f_caption = f_caption
         if f_caption is None:
             f_caption = f"{files.file_name}"
-        await query.answer(url=f"href='https://telegram.me/{temp.U_NAME}?start=file_{query.message.chat.id}_{file.file_id}")
+        await query.answer(url=f"https://telegram.me/{temp.U_NAME}?start=file_{query.message.chat.id}_{files.file_id}")
 
     elif query.data.startswith("autofilter_delete"):
         await Media.collection.drop()
-        if MULTIPLE_DB:    
+        if MULTIPLE_DB:      
             await Media2.collection.drop()
         await query.answer("Eᴠᴇʀʏᴛʜɪɴɢ's Gᴏɴᴇ")
         await query.message.edit('ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ᴅᴇʟᴇᴛᴇᴅ ᴀʟʟ ɪɴᴅᴇxᴇᴅ ꜰɪʟᴇꜱ ✅')
@@ -936,7 +879,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
             btn = []
             chat = file_id.split("_")[0]
             settings = await get_settings(chat)
-            fsub_channels = list(dict.fromkeys((settings.get('fsub', []) if settings else [])+ AUTH_CHANNELS)) 
+            fsub_channels = list(dict.fromkeys((settings.get('fsub', []) if settings else [])+ AUTH_CHANNELS))   
+            from utils import is_subscribed, is_req_subscribed
             btn += await is_subscribed(client, query.from_user.id, fsub_channels)
             btn += await is_req_subscribed(client, query.from_user.id, AUTH_REQ_CHANNELS)
             if btn:
@@ -1274,7 +1218,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     reply_markup=InlineKeyboardMarkup(btn2)
                 )
         else:
-            await query.answer("Yᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ sᴜғғɪᴄɪᴀɴᴛ ʀɪɢᴛs ᴛᴏ ᴅᴏ ᴛʜɪs !", show_alert=True)
+            await query.answer("Yᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ sᴜғғɪᴄɪᴀɴᴛ ʀɪɢʜᴛs ᴛᴏ ᴅᴏ ᴛʜɪs !", show_alert=True)
 
     elif query.data.startswith("already_available"):
         ident, from_user = query.data.split("#")
@@ -1320,7 +1264,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     reply_markup=InlineKeyboardMarkup(btn2)
                 )
         else:
-            await query.answer("Yᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ sᴜғғɪᴄɪᴀɴᴛ ʀɪɢᴛs ᴛᴏ ᴅᴏ ᴛʜɪs !", show_alert=True)
+            await query.answer("Yᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ sᴜғғɪᴄɪᴀɴᴛ ʀɪɢʜᴛs ᴛᴏ ᴅᴏ ᴛʜɪs !", show_alert=True)
 
     elif query.data.startswith("alalert"):
         ident, from_user = query.data.split("#")
@@ -1425,21 +1369,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
             await query.answer(f"⚠️ SOMETHING WENT WRONG STREAM LINK  \n\n{e}", show_alert=True)
             return
 
-
-    elif query.data == "prestream":
-        await query.answer(text=script.PRE_STREAM_ALERT, show_alert=True)
-        dreamcinezone = await client.send_photo(
-            chat_id=query.message.chat.id,
-            photo="https://i.ibb.co/whf8xF7j/photo-2025-07-26-10-42-46-7531339305176793100.jpg",
-            caption=script.PRE_STREAM,
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🚀 Buy Premium 🚀", callback_data="premium_info")]
-            ])
-        )
-        await asyncio.sleep(DELETE_TIME)
-        await dreamcinezone.delete()
-
-
     elif query.data == "pagesn1":
         await query.answer(text=script.PAGE_TXT, show_alert=True)
 
@@ -1453,8 +1382,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton(' ʜᴇʟᴘ 📢', callback_data='help'),
                     InlineKeyboardButton(' ᴀʙᴏᴜᴛ 📖', callback_data='about')
                 ],[
-                    InlineKeyboardButton('ᴛᴏᴘ sᴇᴀʀᴄʜɪɴɢ ⭐', callback_data="topsearch"),
-                     InlineKeyboardButton('ᴜᴘɢʀᴀᴅᴇ 🎟', callback_data="premium_info"),
+                    InlineKeyboardButton('ᴛᴏᴘ sᴇᴀʀᴄʜɪɴɢ ⭐', callback_data="topsearch")
                 ]]
         reply_markup = InlineKeyboardMarkup(buttons)
         current_time = datetime.now(pytz.timezone(TIMEZONE))
@@ -1532,40 +1460,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
             parse_mode=enums.ParseMode.HTML
         )
 
-    elif query.data == "give_trial":
-        try:
-            user_id = query.from_user.id
-            has_free_trial = await db.check_trial_status(user_id)
-            if has_free_trial:
-                await query.answer(
-                    "🚸 ʏᴏᴜ'ᴠᴇ ᴀʟʀᴇᴀᴅʏ ᴄʟᴀɪᴍᴇᴅ ʏᴏᴜʀ ꜰʀᴇᴇ ᴛʀɪᴀʟ ᴏɴᴄᴇ !\n\n📌 ᴄʜᴇᴄᴋᴏᴜᴛ ᴏᴜʀ ᴘʟᴀɴꜱ ʙʏ : /plan",
-                    show_alert=True
-                )
-                return
-            else:
-                await db.give_free_trial(user_id)
-                await query.answer("✅ Trial activated!", show_alert=True)
-
-                msg = await client.send_photo(
-                    chat_id=query.message.chat.id,
-                    photo="https://i.ibb.co/0jC8MSDZ/photo-2025-07-26-10-42-36-7531339283701956616.jpg",
-                    caption=(
-                        "<b>🥳 ᴄᴏɴɢʀᴀᴛᴜʟᴀᴛɪᴏɴꜱ\n\n"
-                        "🎉 ʏᴏᴜ ᴄᴀɴ ᴜsᴇ ꜰʀᴇᴇ ᴛʀᴀɪʟ ꜰᴏʀ <u>5 ᴍɪɴᴜᴛᴇs</u> ꜰʀᴏᴍ ɴᴏᴡ !\n\n"
-                        "ɴᴇᴇᴅ ᴘʀᴇᴍɪᴜᴍ 👉🏻 /plan</b>"
-                    ),
-                    parse_mode=enums.ParseMode.HTML,
-                    reply_markup=InlineKeyboardMarkup([[
-                        InlineKeyboardButton("🚀 Buy Premium 🚀", callback_data="premium_info")
-                    ]])
-                )
-                await asyncio.sleep(DELETE_TIME)
-                return await msg.delete()
-        except Exception as e:
-            logging.exception("Error in give_trial callback")
-
-
-
     elif query.data == "source":
         buttons = [[
             InlineKeyboardButton('ᴅʀᴇᴀᴍxʙᴏᴛᴢ 📜', url='https://github.com/DreamXBotz/Auto_Filter_Bot.git'),
@@ -1578,9 +1472,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
             parse_mode=enums.ParseMode.HTML
         )
 
-    elif query.data == "ref_point":
-        await query.answer(f'You Have: {referdb.get_refer_points(query.from_user.id)} Refferal points.', show_alert=True)
-
     elif query.data == "disclaimer":
             btn = [[
                     InlineKeyboardButton("⇋ ʙᴀᴄᴋ ⇋", callback_data="about")
@@ -1591,81 +1482,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 reply_markup=reply_markup,
                 parse_mode=enums.ParseMode.HTML
             )
-
-    elif query.data == "premium_info":
-        try:
-            btn = [[
-                InlineKeyboardButton('• ʙᴜʏ ᴘʀᴇᴍɪᴜᴍ •', callback_data='buy_info'),
-            ],[
-                InlineKeyboardButton('• ʀᴇꜰᴇʀ ꜰʀɪᴇɴᴅꜱ', callback_data='reffff'),
-                InlineKeyboardButton('ꜰʀᴇᴇ ᴛʀɪᴀʟ •', callback_data='give_trial')
-            ],[
-                InlineKeyboardButton('⇋ ʙᴀᴄᴋ ᴛᴏ ʜᴏᴍᴇ ⇋', callback_data='start')
-            ]]
-            reply_markup = InlineKeyboardMarkup(btn)
-            await client.edit_message_media(
-                chat_id=query.message.chat.id,
-                message_id=query.message.id,
-                media=InputMediaPhoto(media=SUBSCRIPTION, caption=script.BPREMIUM_TXT, parse_mode=enums.ParseMode.HTML),
-                reply_markup=reply_markup
-            )
-        except Exception as e:
-            logging.exception("Exception in 'premium_info' callback")
-
-
-    elif query.data == "buy_info":
-        try:
-            btn = [[
-                InlineKeyboardButton('ꜱᴛᴀʀ', callback_data='star_info'),
-                InlineKeyboardButton('ᴜᴘɪ', callback_data='upi_info')
-            ],[
-                InlineKeyboardButton('⇋ ʙᴀᴄᴋ ᴛᴏ ᴘʀᴇᴍɪᴜᴍ ⇋', callback_data='premium_info')
-            ]]
-            reply_markup = InlineKeyboardMarkup(btn)
-            await client.edit_message_media(
-                chat_id=query.message.chat.id,
-                message_id=query.message.id,
-                media=InputMediaPhoto(media=SUBSCRIPTION, caption=script.PREMIUM_TEXT, parse_mode=enums.ParseMode.HTML),
-                reply_markup=reply_markup
-            )
-        except Exception as e:
-            logging.exception("Exception in 'buy_info' callback")
-
-    elif query.data == "upi_info":
-        try:
-            btn = [[
-                InlineKeyboardButton('• ꜱᴇɴᴅ  ᴘᴀʏᴍᴇɴᴛ ꜱᴄʀᴇᴇɴꜱʜᴏᴛ •', url=OWNER_LNK),
-            ],[
-                InlineKeyboardButton('⇋ ʙᴀᴄᴋ ⇋', callback_data='buy_info')
-            ]]
-            reply_markup = InlineKeyboardMarkup(btn)
-            await client.edit_message_media(
-                chat_id=query.message.chat.id,
-                message_id=query.message.id,
-                media=InputMediaPhoto(media=SUBSCRIPTION, caption=script.PREMIUM_UPI_TEXT.format(OWNER_UPI_ID), parse_mode=enums.ParseMode.HTML),
-                reply_markup=reply_markup
-            )
-        except Exception as e:
-            logging.exception("Exception in 'upi_info' callback")
-
-    elif query.data == "star_info":
-        try:
-            btn = [
-                InlineKeyboardButton(f"{stars}⭐", callback_data=f"buy_{stars}")
-                for stars, days in STAR_PREMIUM_PLANS.items()
-            ]
-            buttons = [btn[i:i + 2] for i in range(0, len(btn), 2)]
-            buttons.append([InlineKeyboardButton("⋞ ʙᴀᴄᴋ", callback_data="buy_info")])
-            reply_markup = InlineKeyboardMarkup(buttons)
-            await client.edit_message_media(
-                chat_id=query.message.chat.id,
-                message_id=query.message.id,
-                media=InputMediaPhoto(media=SUBSCRIPTION, caption=script.PREMIUM_STAR_TEXT, parse_mode=enums.ParseMode.HTML),
-                reply_markup=reply_markup
-            )
-        except Exception as e:
-            logging.exception("Exception in 'star' callback")
-
 
     elif query.data.startswith("grp_pm"):
         _, grp_id = query.data.split("#")
@@ -1726,7 +1542,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
             await query.message.edit_reply_markup(reply_markup)
     await query.answer(MSG_ALRT)
 
-
 async def auto_filter(client, msg, spoll=False):
     """
     Core auto_filter logic with timing/debug logging removed.
@@ -1773,8 +1588,7 @@ async def auto_filter(client, msg, spoll=False):
 
                 find = search.split(" ")
                 search = ""
-                removes = ["in", "upload", "series", "full",
-                           "horror", "thriller", "mystery", "print", "file"]
+                removes = ["in", "upload", "series", "full", "horror", "thriller", "mystery", "print", "file"]
                 for x in find:
                     if x in removes:
                         continue
@@ -1845,10 +1659,7 @@ async def auto_filter(client, msg, spoll=False):
             btn.insert(0,
                        [
                            InlineKeyboardButton(
-                               "ʀᴇᴍᴏᴠᴇ ᴀᴅs", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                           InlineKeyboardButton(
                                "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
-
                        ])
         else:
             btn = []
@@ -1864,8 +1675,6 @@ async def auto_filter(client, msg, spoll=False):
                        )
             btn.insert(0,
                        [
-                           InlineKeyboardButton(
-                               "ʀᴇᴍᴏᴠᴇ ᴀᴅs", url=f"https://t.me/{temp.U_NAME}?start=premium"),
                            InlineKeyboardButton(
                                "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
                        ])
@@ -2031,14 +1840,13 @@ async def ai_spell_check(chat_id, wrong_name):
             return movie
         movie_list.remove(movie)
 
-
 async def advantage_spell_chok(client, message):
     mv_id = message.id
     search = message.text
     chat_id = message.chat.id
     settings = await get_settings(chat_id)
     query = re.sub(
-        r"\b(pl(i|e)*?(s|z+|ease|se|ese|(e+)s(e)?)|((send|snd|giv(e)?|gib)(\sme)?)|movie(s)?|new|latest|br((o|u)h?)*|^h(e|a)?(l)*(o)*|mal(ayalam)?|t(h)?amil|file|that|find|und(o)*|kit(t(i|y)?)?o(w)?|thar(u)?(o)*w?|kittum(o)*|aya(k)*(um(o)*)?|full\smovie|any(one)|with\ssubtitle(s)?)",
+        r"\b(pl(i|e)?(s|z+|ease|se|ese|(e+)s(e)?)|((send|snd|giv(e)?|gib)(\sme)?)|movie(s)?|new|latest|br((o|u)h?)|^h(e|a)?(l)(o)|mal(ayalam)?|t(h)?amil|file|that|find|und(o)|kit(t(i|y)?)?o(w)?|thar(u)?(o)w?|kittum(o)|aya(k)(um(o)*)?|full\smovie|any(one)|with\ssubtitle(s)?)",
         "", message.text, flags=re.IGNORECASE)
     query = query.strip() + " movie"
     try:
